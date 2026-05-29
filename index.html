@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreyaOden • Guidance Spirituelle & Tirages</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght=0,400;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght=0,300;0,400;0,600;1,400&family=Cinzel:wght=400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CHARGEMENT DE GSAP & SCROLLTRIGGER -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        :root {
+            --violet-deep: #040109;
+            --violet-mid: #110421;
+            --violet-light: #2e0e5c;
+            --violet-glow: #e9d5ff;
+            --gold: #c9a84c;
+            --gold-light: #e8c97a;
+            --gold-pale: #f5e6c0;
+            --rose-gold: #d4956a;
+            --text-dim: rgba(245,230,192,0.6);
+        }
+ 
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--violet-deep); }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(var(--gold), var(--violet-light)); border-radius: 10px; }
+ 
+        body {
+            background: var(--violet-deep);
+            color: var(--gold-pale);
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            overflow-x: hidden;
+            visibility: hidden; 
+        }
+ 
+        h1, h2, h3, h4 { font-family: 'Cinzel', serif; letter-spacing: 0.2em; }
+ 
+        /* ===== EFFETS DE FOND ===== */
+        #particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+        .star { position: absolute; border-radius: 50%; background: var(--gold-light); opacity: 0.3; }
+ 
+        /* ===== HERO SECTION ===== */
+        .hero {
+            min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            position: relative; text-align: center; overflow: hidden; padding-top: 6rem;
+        }
+        .hero-bg-layer {
+            position: absolute; inset: 0;
+            background: radial-gradient(circle at 50% 50%, #1c0333 0%, #090114 70%, var(--violet-deep) 100%);
+            z-index: 1;
+        }
+        .hero-content { position: relative; z-index: 3; max-width: 90vw; margin-bottom: 2rem; will-change: transform; }
+        .hero-eyebrow { font-size: 0.85rem; letter-spacing: 0.7em; color: var(--gold); text-transform: uppercase; margin-bottom: 2rem; }
+        .hero-name { font-family: 'Playfair Display', serif; font-size: clamp(3.5rem, 10vw, 8.5rem); font-weight: 900; color: var(--gold-pale); line-height: 1; text-shadow: 0 0 40px rgba(147,51,234,0.5); margin-bottom: 1.5rem; }
+        .divider { width: 200px; height: 1px; background: linear-gradient(to right, transparent, var(--gold), transparent); margin: 2rem auto; }
+        .hero-sub { font-size: clamp(0.75rem, 2vw, 1rem); letter-spacing: 0.5em; color: var(--gold); text-transform: uppercase; }
+        .hero-tagline { font-style: italic; font-size: clamp(1.1rem, 2.5vw, 1.5rem); color: var(--text-dim); margin-top: 1.5rem; }
+ 
+        /* ===== PHOTOS ASSOMBRIES ET FONDUES ===== */
+        .contact-banner-wrapper {
+            width: 100%; max-width: 550px; margin: 0 auto; text-align: center; position: relative; z-index: 5;
+            will-change: transform, opacity;
+        }
+        .contact-banner {
+            width: 100%; height: auto; display: block; border: none; box-shadow: none; border-radius: 0;
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+            mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+        }
+
+        /* ===== INTRO CITATION ===== */
+        .intro { background: #06020d; text-align: center; padding: 8rem 2rem; }
+        .intro-quote { font-family: 'Playfair Display', serif; font-style: italic; font-size: clamp(1.8rem, 4.5vw, 3rem); line-height: 1.6; color: var(--gold-pale); max-width: 900px; margin: 0 auto; }
+ 
+        /* ===== PRATIQUES CARTES (STACKING GSAP) ===== */
+        .pratiques { background: var(--violet-deep); padding-bottom: 4rem; }
+        .pratiques-inner { max-width: 680px; margin: 0 auto; }
+        .section-label { font-family: 'Cinzel', serif; font-size: 0.75rem; letter-spacing: 0.7em; color: var(--gold); text-transform: uppercase; margin-bottom: 2rem; text-align: center; display: block; }
+        section h2 { font-size: clamp(2.2rem, 5vw, 3.5rem); text-align: center; margin-bottom: 5rem; color: var(--gold-pale); }
+        
+        .pratiques-grid { 
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+          
+        .pratique-card {
+            background: linear-gradient(135deg, rgba(46,14,92,0.4), rgba(4,1,9,0.95));
+            border: 1px solid rgba(201,168,76,0.15); border-radius: 24px; padding: 4rem 2.5rem;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6); 
+            position: sticky;
+            top: 15vh;
+            margin-bottom: 4rem;
+            transform-origin: center top;
+            will-change: transform, filter, opacity;
+        }
+
+        .pratique-card.card-tarot { background: linear-gradient(135deg, rgba(4, 1, 9, 0.85), rgba(46, 14, 92, 0.75)), url('./interpretation-tarot-de-marseille-1.jpg') center/cover; }
+        .pratique-card.card-pendule { background: linear-gradient(135deg, rgba(4, 1, 9, 0.85), rgba(46, 14, 92, 0.75)), url('./pendulum-1934311_1920.jpg') center/cover; }
+        .pratique-card.card-energie { background: linear-gradient(135deg, rgba(4, 1, 9, 0.85), rgba(46, 14, 92, 0.75)), url('./Lecture-dame-768x512.jpg') center/cover; }
+        .pratique-card.card-guides { background: linear-gradient(135deg, rgba(4, 1, 9, 0.85), rgba(46, 14, 92, 0.75)), url('./contact-avec-des-guides-spirituels.jpg') center/cover; }
+        .pratique-card.card-nordique { background: linear-gradient(135deg, rgba(4, 1, 9, 0.85), rgba(46, 14, 92, 0.75)), url('./Odin_le_pere_des_Dieu_1.jpg') center/cover; }
+        .pratique-card.card-energetique { background: linear-gradient(135deg, rgba(4, 1, 9, 0.85), rgba(46, 14, 92, 0.75)), url('./images.jpg') center/cover; }
+
+        .pratique-icon { font-size: 3.2rem; margin-bottom: 1.5rem; display: inline-block; }
+        .pratique-card h3 { font-size: 1.35rem; color: var(--gold); margin-bottom: 1rem; }
+        .pratique-card p { font-size: 1.05rem; color: var(--text-dim); line-height: 1.7; }
+ 
+        /* ===== GALERIE IMMERSIVE (ÉVOLUTION : EFFET STACKING) ===== */
+        .photo-gallery { background: #05020a; padding: 8rem 2rem 4rem 2rem; }
+        .gallery-container { max-width: 680px; margin: 0 auto; } /* Alignement de la largeur sur les pratiques pour un rendu parfait */
+        
+        .gallery-stack { 
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+          
+        .photo-card {
+            background: linear-gradient(135deg, rgba(46,14,92,0.3), rgba(4,1,9,0.98)); 
+            border: 1px solid rgba(201,168,76,0.15); border-radius: 28px;
+            overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+            position: sticky;
+            top: 15vh;
+            margin-bottom: 4rem;
+            transform-origin: center top;
+            will-change: transform, filter, opacity;
+        }
+        .photo-wrapper {
+            position: relative; width: 100%; height: 360px; background: #0d041a; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .photo-placeholder {
+            width: 100%; height: 100%; background: linear-gradient(45deg, #110421, #2e0e5c);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.2rem;
+            will-change: transform;
+        }
+        .photo-badge {
+            position: absolute; top: 1.2rem; left: 1.2rem; background: rgba(4,1,9,0.9);
+            border: 1px solid var(--gold); padding: 0.5rem 1.2rem; border-radius: 50px;
+            font-family: 'Cinzel', serif; font-size: 0.65rem; color: var(--gold-light); letter-spacing: 0.2em; z-index: 5;
+        }
+        .photo-info { padding: 2.5rem 2.2rem; border-top: 1px solid rgba(201,168,76,0.1); flex-grow: 1; background: rgba(4,1,9,0.8); }
+        .photo-title { font-family: 'Cinzel', serif; font-size: 1.2rem; color: var(--gold-pale); margin-bottom: 0.8rem; }
+        .photo-text { font-size: 1rem; color: var(--text-dim); line-height: 1.7; }
+
+        /* ===== TARIFS ===== */
+        .tarifs { background: var(--violet-deep); padding: 8rem 2rem; }
+        .tarifs-inner { max-width: 850px; margin: 0 auto; }
+        .tarif-list { display: flex; flex-direction: column; gap: 1.8rem; }
+        .tarif-row {
+            display: flex; align-items: center; justify-content: space-between; padding: 1.8rem 2.5rem;
+            background: rgba(46,14,92,0.2); border: 1px solid rgba(201,168,76,0.1); border-radius: 20px;
+            will-change: transform, opacity;
+        }
+        .tarif-row.featured { border-color: rgba(201,168,76,0.4); background: rgba(46,14,92,0.5); position: relative; }
+        .tarif-row.featured::before {
+            content: '✦ Populaire'; position: absolute; top: 8px; right: 20px;
+            font-family: 'Cinzel', serif; font-size: 0.65rem; color: var(--gold); letter-spacing: 0.15em;
+        }
+        .tarif-name { font-family: 'Cinzel', serif; font-size: 1.1rem; color: var(--gold-pale); }
+        .tarif-desc { font-size: 0.9rem; color: var(--text-dim); margin-top: 4px; }
+        .tarif-price { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: var(--gold); }
+        .tarif-dots { flex: 1; margin: 0 2rem; border-bottom: 1px dotted rgba(201,168,76,0.2); }
+ 
+        /* ===== CROYANCES ===== */
+        .croyances { background: #050209; padding: 8rem 2rem; }
+        .croyances-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 5rem; align-items: center; }
+        .belief-list { list-style: none; display: flex; flex-direction: column; gap: 2.2rem; }
+        .belief-list li { display: flex; gap: 1.2rem; font-size: 1.15rem; line-height: 1.7; }
+        .belief-list li::before { content: '⟡'; color: var(--gold); font-size: 1.3rem; }
+        .belief-list strong { color: var(--gold-light); font-family: 'Cinzel', serif; font-size: 1rem; display: block; margin-bottom: 0.3rem; }
+          
+        .rune-box {
+            background: linear-gradient(135deg, rgba(46,14,92,0.6), rgba(4,1,9,0.98));
+            border: 1px solid rgba(201,168,76,0.3); border-radius: 28px; padding: 5rem 3rem; text-align: center;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6); transform-style: preserve-3d; perspective: 1000px;
+        }
+        .rune-symbol { 
+            font-size: 7rem; color: var(--violet-glow); margin-bottom: 2rem; display: block; 
+            text-shadow: 0 0 20px rgba(233,213,255,0.4);
+        }
+ 
+        /* ===== PILULES THEMES ===== */
+        .domaines { background: var(--violet-deep); text-align: center; padding: 8rem 2rem; }
+        .domain-pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.2rem; max-width: 950px; margin: 0 auto; }
+        .domain-pill {
+            background: rgba(46,14,92,0.35); border: 1px solid rgba(201,168,76,0.15); border-radius: 50px;
+            padding: 1.1rem 2.2rem; font-family: 'Cinzel', serif; font-size: 0.85rem; color: var(--gold-pale);
+            letter-spacing: 0.05em; cursor: pointer; will-change: transform;
+        }
+ 
+        /* ===== CONTACT ===== */
+        .contact { background: #05020a; padding: 8rem 2rem 4rem 2rem; }
+        .contact-inner { max-width: 700px; margin: 0 auto; }
+        .form-wrap {
+            background: rgba(46,14,92,0.25); border: 1px solid rgba(201,168,76,0.18);
+            border-radius: 28px; padding: 4.5rem 3.5rem; backdrop-filter: blur(10px);
+            margin-bottom: 3.5rem; will-change: transform, opacity;
+        }
+        .form-group { margin-bottom: 2rem; }
+        .form-group label { display: block; font-family: 'Cinzel', serif; font-size: 0.8rem; color: var(--gold); margin-bottom: 0.8rem; letter-spacing: 0.1em; }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%; background: rgba(4,1,9,0.85); border: 1px solid rgba(201,168,76,0.15);
+            border-radius: 14px; padding: 1.1rem 1.4rem; color: var(--gold-pale);
+            font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; outline: none; transition: border-color 0.3s;
+        }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--gold); }
+          
+        .btn-oracle {
+            width: 100%; background: linear-gradient(135deg, var(--gold), var(--rose-gold)); color: var(--violet-deep);
+            font-family: 'Cinzel', serif; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.25em;
+            padding: 1.3rem; border: none; border-radius: 16px; cursor: pointer; transition: all 0.3s;
+        }
+        .btn-oracle:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(201,168,76,0.4); }
+ 
+        /* ===== FOOTER ===== */
+        footer { padding: 5rem 2rem; text-align: center; border-top: 1px solid rgba(201,168,76,0.1); background: #020104; }
+        .footer-logo { font-family: 'Playfair Display', serif; font-size: 3rem; color: var(--gold); margin-bottom: 1rem; font-style: italic; }
+ 
+        @media (max-width: 768px) {
+            .croyances-inner { grid-template-columns: 1fr; gap: 3.5rem; }
+            .form-wrap { padding: 2.5rem 1.8rem; }
+            section { padding: 6rem 1.2rem; }
+            .tarif-row { padding: 1.5rem 1.5rem; flex-wrap: wrap; gap: 1rem; }
+            .tarif-dots { display: none; }
+            .pratiques-inner, .gallery-container { max-width: 100%; }
+            .pratique-card, .photo-card { top: 10vh; margin-bottom: 3rem; }
+        }
+    </style>
+</head>
+<body>
+ 
+    <div id="particles"></div>
+ 
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="hero-bg-layer"></div>
+        <div class="hero-content">
+            <p class="hero-eyebrow">✦ Guidance Spirituelle & Tirages ✦</p>
+            <h1 class="hero-name">freyaoden</h1>
+            <div class="divider"></div>
+            <p class="hero-sub">Écoute &ensp;•&ensp; Intuition &ensp;•&ensp; Évolution</p>
+            <p class="hero-tagline">Je te guide avec bienveillance à travers les messages de l'univers</p>
+        </div>
+        <div class="contact-banner-wrapper">
+            <img src="./Capture d'écran 2026-05-29 013848.png" alt="FreyaOden" class="contact-banner">
+        </div>
+    </section>
+
+    <!-- INTRO -->
+    <section class="intro">
+        <p class="section-label" style="margin-bottom: 1rem;">✦ Mon Approche ✦</p>
+        <p class="intro-quote">"Je te guide avec bienveillance à travers les messages de tes guides et de l'univers."</p>
+    </section>
+ 
+    <!-- PRATIQUES -->
+    <section class="pratiques">
+        <div class="pratiques-inner">
+            <p class="section-label">✦ Ce Que Je Propose ✦</p>
+            <h2>Mes Pratiques</h2>
+            <div class="pratiques-grid">
+                
+                <div class="pratique-card card-tarot">
+                    <div class="pratique-icon">🃏</div>
+                    <h3>Tirage de Cartes</h3>
+                    <p>Tarot, Oracle… les cartes révèlent les énergies en présence dans ta vie et t'offrent un éclairage précis sur ta situation.</p>
+                </div>
+                
+                <div class="pratique-card card-pendule">
+                    <div class="pratique-icon">💎</div>
+                    <h3>Tirage au Pendule</h3>
+                    <p>L'oscillation du cristal capte les vibrations de ton énergie et répond à tes questions les plus profondes.</p>
+                </div>
+                
+                <div class="pratique-card card-energie">
+                    <div class="pratique-icon">🌊</div>
+                    <h3>Lecture d'Énergies</h3>
+                    <p>Ressenti fin et intuitif de ton champ énergétique pour identifier les blocages, les dons et les dynamiques présentes.</p>
+                </div>
+                
+                <div class="pratique-card card-guides">
+                    <div class="pratique-icon">🕊️</div>
+                    <h3>Messages des Guides</h3>
+                    <p>Transmission des messages de tes guides spirituels, ancêtres ou esprits de lumière qui cherchent à te parler.</p>
+                </div>
+                
+                <div class="pratique-card card-nordique">
+                    <div class="pratique-icon">ᚠ</div>
+                    <h3>Croyances Nordiques</h3>
+                    <p>Travail avec les énergies de Freya, Odin, des runes ancestrales et des esprits de la tradition nordique.</p>
+                </div>
+                
+                <div class="pratique-card card-energetique">
+                    <div class="pratique-icon">✨</div>
+                    <h3>Travail Énergétique</h3>
+                    <p>Nettoyage, alignement et renforcement de ton énergie pour retrouver clarté, ancrage et élévation vibratoire.</p>
+                </div>
+                
+            </div>
+        </div>
+    </section>
+
+    <!-- GALERIE (S'EMPILE MAINTENANT AUSSI MAGIQUEMENT) -->
+    <section class="photo-gallery">
+        <div class="gallery-container">
+            <p class="section-label">✦ Immersion Visuelle ✦</p>
+            <h2>Univers & Supports</h2>
+            <div class="gallery-stack">
+                
+                <div class="photo-card">
+                    <div class="photo-wrapper">
+                        <span class="photo-badge">Tarot Divinatoire</span>
+                        <div class="photo-placeholder">
+                            <span style="font-size: 3.5rem;">🔮</span>
+                            <span style="font-size: 0.8rem; letter-spacing: 2px; color: var(--gold);">IMAGE DU TIRAGE</span>
+                        </div>
+                    </div>
+                    <div class="photo-info">
+                        <h3 class="photo-title">Les Oracles en Action</h3>
+                        <p class="photo-text">Exemple concret d'une disposition de cartes pour une guidance générale. Chaque lame est interprétée selon vos vibrations.</p>
+                    </div>
+                </div>
+                
+                <div class="photo-card">
+                    <div class="photo-wrapper">
+                        <span class="photo-badge">Énergies Nordiques</span>
+                        <div class="photo-placeholder" style="background: linear-gradient(45deg, #050209, #1c0333);">
+                            <span style="font-size: 3.5rem;">ᛟ</span>
+                            <span style="font-size: 0.8rem; letter-spacing: 2px; color: var(--gold);">IMAGE DES RUNES</span>
+                        </div>
+                    </div>
+                    <div class="photo-info">
+                        <h3 class="photo-title">L'Autel Ancestral</h3>
+                        <p class="photo-text">Mes outils de connexion sacrée : Runes en bois de frêne, cristaux purifiés et symboles protecteurs d'Odin et Freya.</p>
+                    </div>
+                </div>
+                
+                <div class="photo-card">
+                    <div class="photo-wrapper">
+                        <span class="photo-badge">Pendule & Cristaux</span>
+                        <div class="photo-placeholder" style="background: linear-gradient(45deg, #2e0e5c, #05020a);">
+                            <span style="font-size: 3.5rem;">💎</span>
+                            <span style="font-size: 0.8rem; letter-spacing: 2px; color: var(--gold);">IMAGE DE LA GUIDANCE</span>
+                        </div>
+                    </div>
+                    <div class="photo-info">
+                        <h3 class="photo-title">Le Cristal de Quartz</h3>
+                        <p class="photo-text">Utilisé à distance pour confirmer des choix précis, débloquer des chakras ou affiner les réponses obtenues.</p>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </section>
+ 
+    <!-- TARIFS -->
+    <section class="tarifs">
+        <div class="tarifs-inner">
+            <p class="section-label">✦ Investissement ✦</p>
+            <h2>Tarifs Raisonnables</h2>
+            <div class="tarif-list">
+                <div class="tarif-row">
+                    <div>
+                        <div class="tarif-name">1 Question</div>
+                        <div class="tarif-desc">Une réponse claire et directe</div>
+                    </div>
+                    <div class="tarif-dots"></div>
+                    <div class="tarif-price">10€</div>
+                </div>
+                <div class="tarif-row">
+                    <div>
+                        <div class="tarif-name">Tirage Express</div>
+                        <div class="tarif-desc">3 cartes</div>
+                    </div>
+                    <div class="tarif-dots"></div>
+                    <div class="tarif-price">15€</div>
+                </div>
+                <div class="tarif-row featured">
+                    <div>
+                        <div class="tarif-name">Tirage Complet</div>
+                        <div class="tarif-desc">5 cartes</div>
+                    </div>
+                    <div class="tarif-dots"></div>
+                    <div class="tarif-price">25€</div>
+                </div>
+                <div class="tarif-row">
+                    <div>
+                        <div class="tarif-name">Tirage Approfondi</div>
+                        <div class="tarif-desc">10 cartes</div>
+                    </div>
+                    <div class="tarif-dots"></div>
+                    <div class="tarif-price">35€</div>
+                </div>
+                <div class="tarif-row">
+                    <div>
+                        <div class="tarif-name">Guidance Complète</div>
+                        <div class="tarif-desc">Sans limite de cartes</div>
+                    </div>
+                    <div class="tarif-dots"></div>
+                    <div class="tarif-price">50€</div>
+                </div>
+            </div>
+        </div>
+    </section>
+ 
+    <!-- CROYANCES -->
+    <section class="croyances">
+        <div class="croyances-inner">
+            <div class="croyances-left">
+                <p class="section-label" style="text-align: left;">✦ Énergies & Traditions ✦</p>
+                <h2 style="text-align: left; margin-bottom: 3rem;">Les Énergies</h2>
+                <ul class="belief-list">
+                    <li><div><strong>Freya</strong>Déesse de l'amour, de la beauté sauvage et de la pure intuition.</div></li>
+                    <li><div><strong>Odin</strong>Sagesse infinie, quête de vision et haute protection spirituelle.</div></li>
+                    <li><div><strong>Esprits de la Nature</strong>Forces invisibles ancrées à la Terre qui éclairent tes pas.</div></li>
+                    <li><div><strong>Runes Ancestrales</strong>L'alphabet cryptique des anciens peuples nordiques.</div></li>
+                </ul>
+            </div>
+            <div class="rune-box">
+                <div class="rune-symbol">ᛟ</div>
+                <p style="font-style: italic; color: var(--text-dim);">"Les runes ne prédisent pas l'avenir. Elles révèlent ce que ton âme sait déjà mais n'ose pas encore entendre."</p>
+            </div>
+        </div>
+    </section>
+ 
+    <!-- DOMAINES -->
+    <section class="domaines">
+        <p class="section-label">✦ Thèmes de Guidance ✦</p>
+        <h2>Ce que nous explorons</h2>
+        <div class="domain-pills">
+            <div class="domain-pill">♡ Amour & Relations</div>
+            <div class="domain-pill">💼 Travail & Carrière</div>
+            <div class="domain-pill">👨‍👩‍👧 Famille & Liens</div>
+            <div class="domain-pill">🛡️ Protection Énergétique</div>
+            <div class="domain-pill">🔮 Énergies & Intuition</div>
+            <div class="domain-pill">🌱 Développement Personnel</div>
+            <div class="domain-pill">✨ Messages Divins</div>
+            <div class="domain-pill">👑 Clarté & Décisions</div>
+        </div>
+    </section>
+ 
+    <!-- CONTACT -->
+    <section class="contact">
+        <div class="contact-inner">
+            <p class="section-label">✦ Déposer ton Intention ✦</p>
+            <h2>Prendre Rendez-vous</h2>
+            
+            <div class="form-wrap">
+                <div class="form-group">
+                    <label>Prénom</label>
+                    <input type="text" placeholder="Ton prénom...">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" placeholder="ton@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Type de Séance</label>
+                    <select>
+                        <option value="">Choisir une formule...</option>
+                        <option>1 Question — 10€</option>
+                        <option>Tirage Express (3 cartes) — 15€</option>
+                        <option>Tirage Complet (5 cartes) — 25€</option>
+                        <option>Tirage Approfondi (10 cartes) — 35€</option>
+                        <option>Guidance Complète — 50€</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Ta Question ou Situation</label>
+                    <textarea placeholder="Partage ce qui t'amène... Tout reste confidentiel."></textarea>
+                </div>
+                <button class="btn-oracle" onclick="alert('✨ Ton intention a été envoyée ! ♡')">
+                    ♡ Envoyer mon Intention ♡
+                </button>
+            </div>
+
+            <div class="contact-banner-wrapper">
+                <img src="./b89cb616-f490-4acb-846b-1ab1144c4f9d.jpg" alt="FreyaOden" class="contact-banner">
+            </div>
+        </div>
+    </section>
+ 
+    <footer>
+        <div class="footer-logo">freyaoden</div>
+        <p style="margin-bottom: 1rem; color: var(--gold)">✦ Retrouve-moi sur TikTok : @freya.oden ✦</p>
+        <p style="font-size: 0.7rem; letter-spacing: 0.2em; color: var(--text-dim);">© 2026 FreyaOden • Guidance Spirituelle • Que l'univers guide tes pas.</p>
+    </footer>
+ 
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+        document.body.style.visibility = "visible";
+
+        // 1. PARTICULES (ÉTOILES)
+        const container = document.getElementById('particles');
+        for (let i = 0; i < 40; i++) {
+            const s = document.createElement('div');
+            s.className = 'star';
+            const size = Math.random() * 2 + 1;
+            s.style.cssText = `width:${size}px; height:${size}px; top:${Math.random()*100}%; left:${Math.random()*100}%;`;
+            container.appendChild(s);
+            
+            gsap.to(s, {
+                opacity: Math.random(),
+                scale: Math.random() * 1.5 + 0.5,
+                duration: 1.5 + Math.random() * 2,
+                repeat: -1,
+                yoyo: true,
+                ease: "sine.inOut",
+                delay: Math.random() * 2
+            });
+        }
+
+        // 2. HERO ANIMATIONS
+        const tlHero = gsap.timeline({ defaults: { ease: "power4.out" } });
+        tlHero.from(".hero-eyebrow", { opacity: 0, y: -20, duration: 1.2 })
+              .from(".hero-name", { opacity: 0, y: 40, scale: 0.95, filter: "blur(10px)", duration: 1.5 }, "-=0.8")
+              .from(".divider", { width: 0, duration: 1 }, "-=1")
+              .from(".hero-sub, .hero-tagline", { opacity: 0, y: 20, duration: 1.2 }, "-=0.8")
+              .from(".hero .contact-banner-wrapper", { opacity: 0, scale: 0.9, y: 60, filter: "blur(15px)", duration: 1.8 }, "-=1.2");
+
+        gsap.to(".hero-content", {
+            yPercent: 35, ease: "none",
+            scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true }
+        });
+        gsap.to(".hero .contact-banner-wrapper", {
+            yPercent: -15, scale: 1.05, ease: "none",
+            scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true }
+        });
+
+        // 3. STACKING DES CARTES "PRATIQUES"
+        const pratiqueCards = gsap.utils.toArray(".pratique-card");
+        pratiqueCards.forEach((card, i) => {
+            gsap.from(card, {
+                opacity: 0, y: 100, scale: 0.9, filter: "blur(5px)", duration: 1,
+                scrollTrigger: { trigger: card, start: "top bottom-=10%", toggleActions: "play none none reverse" }
+            });
+
+            if (i < pratiqueCards.length - 1) {
+                gsap.to(card, {
+                    scale: 0.92 - (pratiqueCards.length - i) * 0.01,
+                    opacity: 0.4,
+                    filter: "grayscale(80%) blur(2px)",
+                    scrollTrigger: { trigger: pratiqueCards[i + 1], start: "top top+=20%", end: "top top", scrub: true }
+                });
+            }
+        });
+
+        // ===================================================
+        // 4. NOUVEAU : STACKING DES CARTES "IMMERSION VISUELLE" (GALERIE)
+        // ===================================================
+        const photoCards = gsap.utils.toArray(".photo-card");
+        photoCards.forEach((card, i) => {
+            // Entrée de la carte
+            gsap.from(card, {
+                opacity: 0,
+                y: 100,
+                scale: 0.9,
+                filter: "blur(5px)",
+                duration: 1,
+                scrollTrigger: {
+                    trigger: card,
+                    start: "top bottom-=10%",
+                    toggleActions: "play none none reverse"
+                }
+            });
+
+            // Écrasement cinématique sous la carte suivante
+            if (i < photoCards.length - 1) {
+                gsap.to(card, {
+                    scale: 0.93 - (photoCards.length - i) * 0.01,
+                    opacity: 0.35,
+                    filter: "grayscale(60%) blur(3px)",
+                    scrollTrigger: {
+                        trigger: photoCards[i + 1],
+                        start: "top top+=20%",
+                        end: "top top",
+                        scrub: true
+                    }
+                });
+            }
+        });
+
+        // Interaction survol images galerie (effet d'aspiration)
+        document.querySelectorAll('.photo-card').forEach(card => {
+            const img = card.querySelector('.photo-placeholder');
+            card.addEventListener('mouseenter', () => gsap.to(img, { scale: 1.08, duration: 0.6, ease: "power2.out" }));
+            card.addEventListener('mouseleave', () => gsap.to(img, { scale: 1, duration: 0.6, ease: "power2.out" }));
+        });
+
+        // 5. ANIMATIONS AUTRES SECTIONS
+        document.querySelectorAll("section h2, .section-label").forEach(title => {
+            gsap.from(title, {
+                opacity: 0, y: 30, duration: 1.2, ease: "power3.out",
+                scrollTrigger: { trigger: title, start: "top bottom-=10%", toggleActions: "play none none reverse" }
+            });
+        });
+
+        gsap.from(".intro-quote", {
+            opacity: 0, scale: 0.98, y: 30, duration: 1.5, ease: "power2.out",
+            scrollTrigger: { trigger: ".intro", start: "top bottom-=20%" }
+        });
+
+        gsap.from(".tarif-row", {
+            opacity: 0, x: -40, duration: 1, stagger: 0.15, ease: "power3.out",
+            scrollTrigger: { trigger: ".tarif-list", start: "top bottom-=15%" }
+        });
+
+        gsap.from(".belief-list li", {
+            opacity: 0, x: -20, duration: 0.8, stagger: 0.2,
+            scrollTrigger: { trigger: ".belief-list", start: "top bottom-=15%" }
+        });
+
+        gsap.from(".rune-box", {
+            opacity: 0, scale: 0.8, rotationY: 25, duration: 1.5, ease: "back.out(1.4)",
+            scrollTrigger: { trigger: ".rune-box", start: "top bottom-=10%" }
+        });
+
+        gsap.from(".domain-pill", {
+            opacity: 0, scale: 0, y: 20, duration: 0.8,
+            stagger: { each: 0.06, from: "center" }, ease: "back.out(1.7)",
+            scrollTrigger: { trigger: ".domain-pills", start: "top bottom-=10%" }
+        });
+        
+        document.querySelectorAll('.domain-pill').forEach(pill => {
+            pill.addEventListener('mouseenter', () => gsap.to(pill, { scale: 1.1, backgroundColor: "#2e0e5c", borderColor: "#e8c97a", duration: 0.3 }));
+            pill.addEventListener('mouseleave', () => gsap.to(pill, { scale: 1, backgroundColor: "rgba(46,14,92,0.35)", borderColor: "rgba(201,168,76,0.15)", duration: 0.3 }));
+        });
+
+        gsap.from(".form-wrap", {
+            opacity: 0, y: 60, rotationX: -5, duration: 1.4, ease: "power3.out",
+            scrollTrigger: { trigger: ".form-wrap", start: "top bottom-=10%" }
+        });
+
+        gsap.from(".contact .contact-banner-wrapper", {
+            opacity: 0, scale: 0.95, y: 40, duration: 1.5,
+            scrollTrigger: { trigger: ".contact .contact-banner-wrapper", start: "top bottom-=5%" }
+        });
+    </script>
+</body>
+</html>
